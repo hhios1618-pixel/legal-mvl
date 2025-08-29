@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, Send, User, Mail, MapPin, FileText, 
-  Shield, CheckCircle, AlertCircle, Clock,
-  Lock, Eye, EyeOff
+  Shield, CheckCircle, AlertCircle, Clock, Lock
 } from "lucide-react";
 import { ServiceType } from "../types";
 import { SERVICE_LABEL } from "../data";
@@ -28,8 +27,6 @@ export default function IntakeModal({
   const [city, setCity] = useState("");
   const [desc, setDesc] = useState("");
   const [ok, setOk] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [showPrivacy, setShowPrivacy] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Validation states
@@ -50,7 +47,7 @@ export default function IntakeModal({
     setIsSubmitting(true);
     
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     onSubmit({ 
       type, 
@@ -68,51 +65,46 @@ export default function IntakeModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
         {/* Backdrop */}
         <motion.div 
           initial={{opacity:0}}
           animate={{opacity:1}}
           exit={{opacity:0}}
-          className="absolute inset-0 bg-black/70 backdrop-blur-sm" 
+          className="absolute inset-0 bg-black/50" 
           onClick={onClose}
         />
         
-        {/* Modal */}
+        {/* Modal - Bottom sheet on mobile, centered on desktop */}
         <motion.div
-          initial={{opacity:0, y:50, scale:0.95}}
-          animate={{opacity:1, y:0, scale:1}}
-          exit={{opacity:0, y:50, scale:0.95}}
-          transition={{type:"spring", damping:25, stiffness:300}}
-          className="relative w-full max-w-2xl"
+          initial={{opacity:0, y:100}}
+          animate={{opacity:1, y:0}}
+          exit={{opacity:0, y:100}}
+          transition={{type:"spring", damping:30, stiffness:300}}
+          className="relative w-full sm:max-w-lg sm:mx-4"
         >
           {/* Main Card */}
-          <div className="relative rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl overflow-hidden">
-            {/* Background Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10" />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-400/10 rounded-full blur-3xl" />
-            
+          <div className="bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-hidden">
             {/* Header */}
-            <div className="relative p-8 pb-6 border-b border-white/10">
+            <div className="relative p-4 sm:p-6 border-b border-slate-200">
               <button 
                 onClick={onClose}
-                className="absolute right-6 top-6 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                className="absolute right-4 top-4 p-2 rounded-lg hover:bg-slate-100 transition-colors"
                 aria-label="Cerrar"
               >
-                <X className="w-5 h-5 text-white/70 group-hover:text-white" />
+                <X className="w-5 h-5 text-slate-400" />
               </button>
               
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                  ⚖️
+              <div className="flex items-center gap-3 mb-4 pr-12">
+                <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center">
+                  <span className="text-lg">⚖️</span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-lg font-bold text-slate-900">
                     {SERVICE_LABEL[type]}
                   </h3>
-                  <p className="text-white/70">
-                    Complete la información para comenzar su asesoría
+                  <p className="text-sm text-slate-600">
+                    Complete la información para comenzar
                   </p>
                 </div>
               </div>
@@ -120,25 +112,25 @@ export default function IntakeModal({
               {/* Progress Bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/60">Progreso del formulario</span>
-                  <span className="text-white/80 font-medium">{Math.round(progress)}%</span>
+                  <span className="text-slate-600">Progreso</span>
+                  <span className="text-slate-900 font-medium">{Math.round(progress)}%</span>
                 </div>
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                   <motion.div
                     initial={{width:0}}
                     animate={{width:`${progress}%`}}
-                    transition={{duration:0.5}}
-                    className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full"
+                    transition={{duration:0.3}}
+                    className="h-full bg-blue-600 rounded-full"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Form Content */}
-            <div className="relative p-8 space-y-6">
+            {/* Form Content - Scrollable */}
+            <div className="p-4 sm:p-6 space-y-4 max-h-[60vh] overflow-y-auto">
               {/* Name Field */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                   <User className="w-4 h-4" />
                   Nombre completo *
                 </label>
@@ -148,14 +140,14 @@ export default function IntakeModal({
                     placeholder="Ingrese su nombre completo"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    className="w-full px-4 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-blue-400/50 focus:bg-white/10 text-white placeholder-white/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+                    className="w-full h-12 px-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-slate-900 placeholder-slate-400 transition-all duration-200 outline-none"
                   />
                   {name && (
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       {nameValid ? (
-                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <CheckCircle className="w-5 h-5 text-emerald-600" />
                       ) : (
-                        <AlertCircle className="w-5 h-5 text-amber-400" />
+                        <AlertCircle className="w-5 h-5 text-amber-500" />
                       )}
                     </div>
                   )}
@@ -164,7 +156,7 @@ export default function IntakeModal({
 
               {/* Email Field */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                   <Mail className="w-4 h-4" />
                   Correo electrónico *
                 </label>
@@ -174,14 +166,14 @@ export default function IntakeModal({
                     placeholder="ejemplo@correo.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="w-full px-4 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-blue-400/50 focus:bg-white/10 text-white placeholder-white/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+                    className="w-full h-12 px-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-slate-900 placeholder-slate-400 transition-all duration-200 outline-none"
                   />
                   {email && (
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       {emailValid ? (
-                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <CheckCircle className="w-5 h-5 text-emerald-600" />
                       ) : (
-                        <AlertCircle className="w-5 h-5 text-amber-400" />
+                        <AlertCircle className="w-5 h-5 text-amber-500" />
                       )}
                     </div>
                   )}
@@ -190,7 +182,7 @@ export default function IntakeModal({
 
               {/* City Field */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                   <MapPin className="w-4 h-4" />
                   Ciudad (opcional)
                 </label>
@@ -199,13 +191,13 @@ export default function IntakeModal({
                   placeholder="Santiago, Valparaíso, Concepción..."
                   value={city}
                   onChange={e => setCity(e.target.value)}
-                  className="w-full px-4 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-blue-400/50 focus:bg-white/10 text-white placeholder-white/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+                  className="w-full h-12 px-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-slate-900 placeholder-slate-400 transition-all duration-200 outline-none"
                 />
               </div>
 
               {/* Description Field */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                   <FileText className="w-4 h-4" />
                   Descripción de su caso (opcional)
                 </label>
@@ -213,16 +205,16 @@ export default function IntakeModal({
                   placeholder="Describa brevemente su situación legal..."
                   value={desc}
                   onChange={e => setDesc(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-blue-400/50 focus:bg-white/10 text-white placeholder-white/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/20 resize-none"
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-slate-900 placeholder-slate-400 transition-all duration-200 outline-none resize-none"
                 />
               </div>
 
               {/* Privacy Consent */}
-              <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+              <div className="space-y-3">
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
                   <label className="flex items-start gap-3 cursor-pointer">
-                    <div className="relative mt-1">
+                    <div className="relative mt-0.5">
                       <input
                         type="checkbox"
                         checked={ok}
@@ -231,60 +223,37 @@ export default function IntakeModal({
                       />
                       <div className={`w-5 h-5 rounded border-2 transition-all duration-200 ${
                         ok 
-                          ? 'bg-blue-500 border-blue-500' 
-                          : 'border-white/30 hover:border-white/50'
+                          ? 'bg-blue-600 border-blue-600' 
+                          : 'border-slate-300 hover:border-slate-400'
                       }`}>
                         {ok && (
                           <CheckCircle className="w-5 h-5 text-white -m-0.5" />
                         )}
                       </div>
                     </div>
-                    <div className="flex-1 text-sm text-white/80 leading-relaxed">
+                    <div className="flex-1 text-sm text-slate-700 leading-relaxed">
                       Autorizo el uso de mis datos para contactarme y orientarme legalmente.{" "}
-                      <button
-                        type="button"
-                        onClick={() => setShowPrivacy(!showPrivacy)}
-                        className="text-blue-400 hover:text-blue-300 underline"
-                      >
-                        {showPrivacy ? 'Ocultar' : 'Ver'} política de privacidad
-                      </button>
+                      <span className="text-blue-600 underline">Ver política de privacidad</span>
                     </div>
                   </label>
-                  
-                  <AnimatePresence>
-                    {showPrivacy && (
-                      <motion.div
-                        initial={{height:0, opacity:0}}
-                        animate={{height:'auto', opacity:1}}
-                        exit={{height:0, opacity:0}}
-                        className="mt-3 pt-3 border-t border-white/10 text-xs text-white/60 leading-relaxed"
-                      >
-                        <p>
-                          <strong>DEMO:</strong> Esta es una demostración. Sus datos no serán almacenados 
-                          ni utilizados para ningún propósito real. En un entorno de producción, 
-                          sus datos estarían protegidos bajo las leyes de protección de datos vigentes.
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
                 {/* Security Notice */}
-                <div className="flex items-center gap-2 text-xs text-white/60">
-                  <Lock className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Lock className="w-3 h-3" />
                   <span>Sus datos están protegidos con encriptación SSL</span>
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="relative p-8 pt-6 border-t border-white/10">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-sm text-white/60">
+            <div className="p-4 sm:p-6 border-t border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between mb-4 text-sm">
+                <div className="flex items-center gap-2 text-slate-600">
                   <Clock className="w-4 h-4" />
-                  <span>Tiempo estimado de respuesta: 5-15 minutos</span>
+                  <span>Respuesta en 5-15 minutos</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-green-400">
+                <div className="flex items-center gap-2 text-emerald-600">
                   <Shield className="w-4 h-4" />
                   <span>Conexión segura</span>
                 </div>
@@ -293,22 +262,19 @@ export default function IntakeModal({
               <button
                 disabled={disabled || isSubmitting}
                 onClick={handleSubmit}
-                className="w-full group relative px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-2xl font-semibold text-lg transition-all duration-300 transform hover:scale-[1.02] disabled:scale-100 hover:shadow-2xl hover:shadow-blue-500/25"
+                className="w-full h-12 bg-blue-700 hover:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <span className="relative z-10 flex items-center justify-center gap-3">
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Procesando...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      Comenzar asesoría ahora
-                    </>
-                  )}
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Comenzar asesoría ahora
+                  </>
+                )}
               </button>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Clock, CheckCircle, AlertCircle, User, 
   FileText, Phone, Calendar, ArrowRight,
-  Zap, Shield, Star, X, Download
+  Shield, Star, X, Download
 } from "lucide-react";
 import { CHECKLIST, SERVICE_LABEL } from "../data";
 import { ServiceType } from "../types";
@@ -42,161 +42,152 @@ export default function StepsOverlay({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4">
+      <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center">
         {/* Backdrop */}
         <motion.div 
           initial={{opacity:0}}
           animate={{opacity:1}}
           exit={{opacity:0}}
-          className="absolute inset-0 bg-black/70 backdrop-blur-sm" 
+          className="absolute inset-0 bg-black/50" 
           onClick={onClose}
         />
         
-        {/* Modal */}
+        {/* Modal - Bottom sheet on mobile, centered on desktop */}
         <motion.div
-          initial={{opacity:0, y:50, scale:0.95}}
-          animate={{opacity:1, y:0, scale:1}}
-          exit={{opacity:0, y:50, scale:0.95}}
-          transition={{type:"spring", damping:25, stiffness:300}}
-          className="relative w-full max-w-3xl max-h-[90vh] overflow-hidden"
+          initial={{opacity:0, y:100}}
+          animate={{opacity:1, y:0}}
+          exit={{opacity:0, y:100}}
+          transition={{type:"spring", damping:30, stiffness:300}}
+          className="relative w-full sm:max-w-2xl sm:mx-4"
         >
           {/* Main Card */}
-          <div className="relative rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-green-500/10" />
-            {isUrgent && (
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-orange-500/10" />
-            )}
-            
+          <div className="bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-hidden">
             {/* Header */}
-            <div className="relative p-8 pb-6 border-b border-white/10">
+            <div className="relative p-4 sm:p-6 border-b border-slate-200">
               <button 
                 onClick={onClose}
-                className="absolute right-6 top-6 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                className="absolute right-4 top-4 p-2 rounded-lg hover:bg-slate-100 transition-colors"
                 aria-label="Cerrar"
               >
-                <X className="w-5 h-5 text-white/70 group-hover:text-white" />
+                <X className="w-5 h-5 text-slate-400" />
               </button>
               
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+              <div className="flex items-start justify-between mb-6 pr-12">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                     isUrgent 
-                      ? 'bg-gradient-to-br from-red-500 to-orange-500' 
-                      : 'bg-gradient-to-br from-blue-500 to-blue-600'
+                      ? 'bg-red-600' 
+                      : 'bg-blue-700'
                   }`}>
-                    {isUrgent ? <AlertCircle className="w-6 h-6 text-white" /> : <Zap className="w-6 h-6 text-white" />}
+                    {isUrgent ? (
+                      <AlertCircle className="w-5 h-5 text-white" />
+                    ) : (
+                      <span className="text-lg">⚖️</span>
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">
                       Pasos Inmediatos
                     </h3>
-                    <p className="text-lg text-white/80">
+                    <p className="text-sm text-slate-600">
                       {SERVICE_LABEL[type]}
                     </p>
                   </div>
                 </div>
 
                 {isUrgent && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-red-500/20 border border-red-500/30">
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span className="text-sm font-medium text-red-400">URGENTE</span>
+                  <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-red-50 border border-red-200">
+                    <AlertCircle className="w-3 h-3 text-red-600" />
+                    <span className="text-xs font-medium text-red-700">URGENTE</span>
                   </div>
                 )}
               </div>
 
               {/* Assignment Status */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-white/80">Asignando abogado especialista</span>
-                  <span className="text-white font-medium">
+                  <span className="text-sm text-slate-600">Asignando abogado especialista</span>
+                  <span className="text-sm font-medium text-slate-900">
                     {assignmentProgress < 95 ? `${Math.round(assignmentProgress)}%` : 'Completando...'}
                   </span>
                 </div>
                 
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                   <motion.div
                     initial={{width:0}}
                     animate={{width:`${assignmentProgress}%`}}
-                    transition={{duration:0.5}}
+                    transition={{duration:0.3}}
                     className={`h-full rounded-full ${
                       isUrgent 
-                        ? 'bg-gradient-to-r from-red-500 to-orange-500' 
-                        : 'bg-gradient-to-r from-blue-500 to-green-500'
+                        ? 'bg-red-600' 
+                        : 'bg-blue-600'
                     }`}
                   />
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2 text-white/60">
+                  <div className="flex items-center gap-2 text-slate-600">
                     <Clock className="w-4 h-4" />
                     <span>Tiempo estimado restante:</span>
                   </div>
-                  <div className={`font-bold ${isUrgent ? 'text-orange-400' : 'text-green-400'}`}>
+                  <div className={`font-semibold ${isUrgent ? 'text-red-600' : 'text-emerald-600'}`}>
                     ~ {sla} min
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Content */}
-            <div className="relative p-8 max-h-96 overflow-y-auto">
-              <div className="mb-6">
-                <h4 className="text-lg font-semibold text-white mb-2">
+            {/* Content - Scrollable */}
+            <div className="p-4 sm:p-6 max-h-[50vh] overflow-y-auto">
+              <div className="mb-4">
+                <h4 className="text-base font-semibold text-slate-900 mb-2">
                   Prepare lo siguiente mientras procesamos su caso:
                 </h4>
-                <p className="text-white/70 text-sm">
+                <p className="text-sm text-slate-600">
                   Tener estos elementos listos acelerará significativamente el proceso
                 </p>
               </div>
 
-              {/* Steps Timeline */}
-              <div className="space-y-4">
+              {/* Steps List */}
+              <div className="space-y-3">
                 {items.map((item, index) => (
                   <motion.div
                     key={index}
-                    initial={{opacity:0, x:-20}}
+                    initial={{opacity:0, x:-10}}
                     animate={{opacity:1, x:0}}
-                    transition={{delay:index * 0.1}}
+                    transition={{delay:index * 0.05}}
                     className="group relative"
                   >
-                    {/* Timeline Line */}
-                    {index < items.length - 1 && (
-                      <div className="absolute left-6 top-12 w-0.5 h-8 bg-white/20" />
-                    )}
-                    
-                    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-300 group-hover:scale-[1.02]">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                       {/* Step Number */}
-                      <div className={`flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white ${
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold text-white ${
                         isUrgent 
-                          ? 'bg-gradient-to-br from-red-500 to-orange-500' 
-                          : 'bg-gradient-to-br from-blue-500 to-blue-600'
+                          ? 'bg-red-600' 
+                          : 'bg-blue-600'
                       }`}>
                         {index + 1}
                       </div>
                       
                       {/* Step Content */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-white leading-relaxed">
+                        <p className="text-sm text-slate-700 leading-relaxed">
                           {item}
                         </p>
                         
                         {/* Step Icons */}
-                        <div className="flex items-center gap-2 mt-2 text-white/50">
-                          {item.toLowerCase().includes('documento') && <FileText className="w-4 h-4" />}
-                          {item.toLowerCase().includes('contacto') && <Phone className="w-4 h-4" />}
-                          {item.toLowerCase().includes('fecha') && <Calendar className="w-4 h-4" />}
-                          {item.toLowerCase().includes('persona') && <User className="w-4 h-4" />}
+                        <div className="flex items-center gap-2 mt-2 text-slate-400">
+                          {item.toLowerCase().includes('documento') && <FileText className="w-3 h-3" />}
+                          {item.toLowerCase().includes('contacto') && <Phone className="w-3 h-3" />}
+                          {item.toLowerCase().includes('fecha') && <Calendar className="w-3 h-3" />}
+                          {item.toLowerCase().includes('persona') && <User className="w-3 h-3" />}
                           <span className="text-xs uppercase tracking-wide">
                             {item.toLowerCase().includes('urgente') ? 'Prioritario' : 'Recomendado'}
                           </span>
                         </div>
                       </div>
 
-                      {/* Hover Arrow */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <ArrowRight className="w-5 h-5 text-white/50" />
-                      </div>
+                      {/* Arrow */}
+                      <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" />
                     </div>
                   </motion.div>
                 ))}
@@ -204,37 +195,22 @@ export default function StepsOverlay({
             </div>
 
             {/* Footer */}
-            <div className="relative p-8 pt-6 border-t border-white/10">
+            <div className="p-4 sm:p-6 border-t border-slate-200 bg-slate-50">
               {/* Status Cards */}
-              <div className="grid sm:grid-cols-3 gap-4 mb-6">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="w-5 h-5 text-green-400" />
-                    <span className="text-sm font-medium text-white">Confidencial</span>
-                  </div>
-                  <p className="text-xs text-white/60">
-                    Su información está protegida
-                  </p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="p-3 rounded-lg bg-white border border-slate-200 text-center">
+                  <Shield className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+                  <div className="text-xs font-medium text-slate-900">Confidencial</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-amber-400" />
-                    <span className="text-sm font-medium text-white">Especialista</span>
-                  </div>
-                  <p className="text-xs text-white/60">
-                    Abogado experto en el área
-                  </p>
+                <div className="p-3 rounded-lg bg-white border border-slate-200 text-center">
+                  <Star className="w-4 h-4 text-amber-500 mx-auto mb-1" />
+                  <div className="text-xs font-medium text-slate-900">Especialista</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="w-5 h-5 text-blue-400" />
-                    <span className="text-sm font-medium text-white">Seguimiento</span>
-                  </div>
-                  <p className="text-xs text-white/60">
-                    Acompañamiento completo
-                  </p>
+                <div className="p-3 rounded-lg bg-white border border-slate-200 text-center">
+                  <CheckCircle className="w-4 h-4 text-blue-600 mx-auto mb-1" />
+                  <div className="text-xs font-medium text-slate-900">Seguimiento</div>
                 </div>
               </div>
 
@@ -242,26 +218,15 @@ export default function StepsOverlay({
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-medium transition-all duration-300 hover:scale-[1.02]"
+                  className="flex-1 h-11 px-4 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-medium transition-colors"
                 >
                   Entendido, continuar
                 </button>
                 
-                <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium transition-all duration-300 hover:scale-[1.02] hover:shadow-lg">
+                <button className="flex items-center justify-center gap-2 h-11 px-4 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-medium transition-colors">
                   <Download className="w-4 h-4" />
                   Descargar checklist
                 </button>
-              </div>
-
-              {/* Demo Notice */}
-              <div className="mt-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                <div className="flex items-center gap-2 text-xs text-amber-400">
-                  <div className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span className="font-medium">DEMO:</span>
-                  <span className="text-amber-400/80">
-                    Simulación de asignación. Los tiempos reales pueden variar.
-                  </span>
-                </div>
               </div>
             </div>
           </div>
