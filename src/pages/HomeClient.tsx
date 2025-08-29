@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Menu, X, Phone, Mail, MapPin } from "lucide-react";
+import { Shield, Menu, X, Phone, Mail, MapPin, Bell, Search } from "lucide-react";
 import Hero from "../components/Hero";
 import ServiceGrid from "../components/ServiceGrid";
 import IntakeModal from "../components/IntakeModal";
@@ -20,90 +20,98 @@ export default function HomeClient() {
   const start = () => window.scrollTo({ top: document.body.clientHeight/4, behavior:"smooth" });
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* Corporate Header */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-slate-200">
-        <div className="mx-auto max-w-6xl px-4 py-3">
+    <main className="min-h-screen bg-gray-50">
+      {/* App-style Header */}
+      <header className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100">
+        <div className="mx-auto max-w-6xl px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo Section */}
+            {/* Logo Section - App Style */}
             <motion.div 
               initial={{opacity:0,x:-20}} 
               animate={{opacity:1,x:0}}
               className="flex items-center gap-3"
             >
               <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center">
-                  <span className="text-lg">⚖️</span>
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
+                  <span className="text-xl">⚖️</span>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-sm" />
               </div>
               <div>
-                <span className="text-lg font-bold text-slate-900">Legal Chile</span>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="text-xl font-bold text-gray-900">Legal Chile</span>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Shield className="w-3 h-3" />
                   <span>Certificado • Seguro • Confiable</span>
                 </div>
               </div>
             </motion.div>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - Modern */}
             <motion.nav 
               initial={{opacity:0,y:-10}} 
               animate={{opacity:1,y:0}}
-              className="hidden lg:flex items-center gap-8"
+              className="hidden lg:flex items-center gap-6"
             >
-              <a href="#servicios" className="text-slate-600 hover:text-slate-900 transition-colors text-sm font-medium">
+              <a href="#servicios" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-50">
                 Servicios
               </a>
-              <a href="#nosotros" className="text-slate-600 hover:text-slate-900 transition-colors text-sm font-medium">
+              <a href="#nosotros" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-50">
                 Nosotros
               </a>
-              <a href="#contacto" className="text-slate-600 hover:text-slate-900 transition-colors text-sm font-medium">
+              <a href="#contacto" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-50">
                 Contacto
               </a>
-              <div className="w-px h-5 bg-slate-300" />
+              <div className="w-px h-6 bg-gray-200" />
               <a 
                 href="/abogados" 
-                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-medium transition-all duration-200 text-sm"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Panel Abogado
               </a>
             </motion.nav>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-slate-600" />
-              ) : (
-                <Menu className="w-5 h-5 text-slate-600" />
-              )}
-            </button>
+            {/* Mobile Actions */}
+            <div className="lg:hidden flex items-center gap-2">
+              <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+                <Search className="w-5 h-5 text-gray-600" />
+              </button>
+              <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+                <Bell className="w-5 h-5 text-gray-600" />
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <Menu className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu - App Style */}
           {mobileMenuOpen && (
             <motion.div
               initial={{opacity:0,height:0}}
               animate={{opacity:1,height:'auto'}}
               exit={{opacity:0,height:0}}
-              className="lg:hidden mt-4 pt-4 border-t border-slate-200"
+              className="lg:hidden mt-4 pt-4 border-t border-gray-100"
             >
-              <nav className="flex flex-col gap-3">
-                <a href="#servicios" className="text-slate-600 hover:text-slate-900 transition-colors py-2 text-sm">
+              <nav className="flex flex-col gap-2">
+                <a href="#servicios" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all py-3 px-4 rounded-xl font-medium">
                   Servicios
                 </a>
-                <a href="#nosotros" className="text-slate-600 hover:text-slate-900 transition-colors py-2 text-sm">
+                <a href="#nosotros" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all py-3 px-4 rounded-xl font-medium">
                   Nosotros
                 </a>
-                <a href="#contacto" className="text-slate-600 hover:text-slate-900 transition-colors py-2 text-sm">
+                <a href="#contacto" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all py-3 px-4 rounded-xl font-medium">
                   Contacto
                 </a>
                 <a 
                   href="/abogados" 
-                  className="mt-2 px-4 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-medium transition-all text-center text-sm"
+                  className="mt-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold transition-all text-center shadow-lg"
                 >
                   Panel Abogado
                 </a>
@@ -142,69 +150,77 @@ export default function HomeClient() {
         slaStartMs={slaStart}
       />
 
-      {/* Corporate Footer */}
-      <footer className="bg-slate-50 border-t border-slate-200">
+      {/* Modern Footer */}
+      <footer className="bg-white border-t border-gray-100">
         <div className="mx-auto max-w-6xl px-4 py-12">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             {/* Brand Column */}
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-700 flex items-center justify-center">
-                  <span className="text-sm">⚖️</span>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
+                  <span className="text-lg">⚖️</span>
                 </div>
-                <span className="text-lg font-bold text-slate-900">Legal Chile</span>
+                <span className="text-xl font-bold text-gray-900">Legal Chile</span>
               </div>
-              <p className="text-slate-600 leading-relaxed mb-4 text-sm">
+              <p className="text-gray-600 leading-relaxed mb-6 text-base">
                 Asesoría legal inmediata y transparente. Conectamos personas con abogados 
                 especializados para resolver casos de manera eficiente y confiable.
               </p>
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <Shield className="w-4 h-4" />
+              <div className="flex items-center gap-3 text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
+                <Shield className="w-4 h-4 text-blue-600" />
                 <span>Certificado por el Colegio de Abogados de Chile</span>
               </div>
             </div>
 
             {/* Services Column */}
             <div>
-              <h4 className="font-semibold text-slate-900 mb-4 text-sm">Servicios</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Derecho Civil</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Derecho Laboral</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Derecho Penal</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Derecho Familiar</a></li>
+              <h4 className="font-bold text-gray-900 mb-6 text-base">Servicios</h4>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Derecho Civil</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Derecho Laboral</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Derecho Penal</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Derecho Familiar</a></li>
               </ul>
             </div>
 
             {/* Contact Column */}
             <div>
-              <h4 className="font-semibold text-slate-900 mb-4 text-sm">Contacto</h4>
-              <ul className="space-y-3 text-sm text-slate-600">
-                <li className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
+              <h4 className="font-bold text-gray-900 mb-6 text-base">Contacto</h4>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3 text-gray-600">
+                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <MapPin className="w-4 h-4 text-gray-500" />
+                  </div>
                   <span>Santiago, Chile</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
+                <li className="flex items-center gap-3 text-gray-600">
+                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <Phone className="w-4 h-4 text-gray-500" />
+                  </div>
                   <span>+56 2 2XXX XXXX</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+                <li className="flex items-center gap-3 text-gray-600">
+                  <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <Mail className="w-4 h-4 text-gray-500" />
+                  </div>
                   <span>contacto@legalchile.cl</span>
                 </li>
-                <li className="text-slate-500">Lun - Vie: 9:00 - 18:00</li>
+                <li className="text-gray-500 text-sm bg-gray-50 px-3 py-2 rounded-lg">
+                  Lun - Vie: 9:00 - 18:00
+                </li>
               </ul>
             </div>
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-slate-500 text-sm">
+          <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-gray-500">
               © {new Date().getFullYear()} Legal Chile — Todos los derechos reservados
             </div>
-            <div className="flex items-center gap-6 text-sm text-slate-500">
-              <a href="#" className="hover:text-slate-700 transition-colors">Términos de Servicio</a>
-              <a href="#" className="hover:text-slate-700 transition-colors">Política de Privacidad</a>
-              <a href="#" className="hover:text-slate-700 transition-colors">Cookies</a>
+            <div className="flex items-center gap-6 text-sm">
+              <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">Términos de Servicio</a>
+              <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">Política de Privacidad</a>
+              <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">Cookies</a>
             </div>
           </div>
         </div>
@@ -212,3 +228,4 @@ export default function HomeClient() {
     </main>
   );
 }
+
