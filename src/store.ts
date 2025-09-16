@@ -1,80 +1,138 @@
+// src/store.ts
+
 import { create } from "zustand";
-import { LegalCase, Lawyer, CaseStatus, ServiceType } from "./types";
-import { SEED_CASES, SEED_LAWYERS } from "./data";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { LegalCase, Lawyer, CaseStatus, ServiceType, CaseNotes, Message } from "./types";
+import { SEED_CASES, SEED_LAWYERS, WORKFLOWS } from "./data";
+
+const initialState = {
+  cases: SEED_CASES,
+  lawyers: SEED_LAWYERS,
+  me: SEED_LAWYERS[0],
+  myCaseIds: [],
+};
 
 type AppState = {
   cases: LegalCase[];
   lawyers: Lawyer[];
-  me: Lawyer; // abogado “logueado” en demo
+  me: Lawyer;
+  myCaseIds: string[];
   reset: () => void;
-
-  // CLIENTE
   createIntake: (payload: {
     type: ServiceType; name: string; email: string; city?: string; description?: string; urgent?: boolean;
   }) => LegalCase;
-
-  // ABOGADO
-  listNewForMe: () => LegalCase[];
-  listMine: () => LegalCase[];
-  claimCase: (caseId: string) => boolean;
+  claimCase: (caseId: string) => void;
   updateStatus: (caseId: string, status: CaseStatus) => void;
+  addPrivateNote: (caseId: string, phaseName: string, note: string) => void;
+  postPublicMessage: (caseId: string, phaseName: string, message: Message) => void;
+  setCurrentPhase: (caseId: string, phaseName: string) => void;
+  toggleActivityCompleted: (caseId: string, activityName: string) => void;
 };
 
-const seed = () => ({
-  cases: JSON.parse(JSON.stringify(SEED_CASES)) as LegalCase[],
-  lawyers: JSON.parse(JSON.stringify(SEED_LAWYERS)) as Lawyer[],
-});
-
-export const useApp = create<AppState>((set, get) => {
-  const { cases, lawyers } = seed();
-  return {
-    cases, lawyers,
-    me: lawyers[0], // María por defecto
-    reset: () => {
-      const s = seed();
-      set({ cases: s.cases, lawyers: s.lawyers });
-    },
-    createIntake: ({ type, name, email, city, description, urgent }) => {
-      const c: LegalCase = {
-        id: "cx" + Math.random().toString(36).slice(2, 9),
-        createdAt: Date.now(),
-        type, priority: urgent ? 2 : 1,
-        name, email, city, description,
-        status: "new",
-      };
-      set({ cases: [c, ...get().cases] });
-      return c;
-    },
-    listNewForMe: () => {
-      const me = get().me;
-      return get().cases
-        .filter(c => c.status === "new" && me.specialties.includes(c.type))
-        .sort((a,b)=> (b.priority - a.priority) || (a.createdAt - b.createdAt));
-    },
-    listMine: () => {
-      const me = get().me;
-      return get().cases
-        .filter(c => c.assignedLawyerId === me.id)
-        .sort((a,b)=> b.createdAt - a.createdAt);
-    },
-    claimCase: (caseId: string) => {
-      const me = get().me;
-      const all = get().cases.slice();
-      const idx = all.findIndex(c=>c.id===caseId);
-      if (idx<0) return false;
-      const c = all[idx];
-      if (c.status !== "new" || c.assignedLawyerId) return false;
-      c.assignedLawyerId = me.id;
-      c.status = "claimed";
-      set({ cases: all });
-      return true;
-    },
-    updateStatus: (caseId, status) => {
-      const all = get().cases.slice();
-      const idx = all.findIndex(c=>c.id===caseId);
-      if (idx<0) return;
-      all[idx].status = status;
-      set({ cases: all });
-    },
-  };
-});
+export const useApp = create<AppState>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
+      reset: () => {
+        localStorage.removeItem('legal-app-storage');
+        window.location.reload();
+      },
+      createIntake: ({ type, name, email, city, description, urgent }) => {
+        const c: LegalCase = {
+          id: "cx" + Math.random().toString(36).slice(2, 9),
+          createdAt: Date.now(),
+          type, 
+          priority: urgent ? 2 : 1,
+          name, 
+          email, 
+          city, 
+          description,
+          status: "new",
+          notes: {},
+          currentPhaseName: WORKFLOWS[type]?.phases[0]?.name || '',
+          completedActivities: {},
+        };
+        set(state => ({ 
+          cases: [c, ...state.cases],
+          myCaseIds: [...state.myCaseIds, c.id] 
+        }));
+        return c;
+      },
+      claimCase: (caseId: string) => {
+        set(state => ({
+          cases: state.cases.map(c => 
+            (c.id === caseId && c.status === 'new' && !c.assignedLawyerId) 
+              ? { ...c, status: 'claimed', assignedLawyerId: get().me.id } 
+              : c
+          ),
+        }));
+      },
+      updateStatus: (caseId, status) => {
+        set(state => ({
+          cases: state.cases.map(c =>
+            c.id === caseId ? { ...c, status } : c
+          ),
+        }));
+      },
+      addPrivateNote: (caseId, phaseName, note) => {
+        set(state => ({
+          cases: state.cases.map(c => {
+            if (c.id === caseId) {
+              const newNotes = { ...c.notes };
+              newNotes[phaseName] = { 
+                ...newNotes[phaseName], 
+                private: { text: note, date: Date.now() } 
+              };
+              return { ...c, notes: newNotes };
+            }
+            return c;
+          }),
+        }));
+      },
+      postPublicMessage: (caseId, phaseName, message) => {
+        set(state => ({
+          cases: state.cases.map(c => {
+            if (c.id === caseId) {
+              const newNotes = { ...c.notes };
+              const currentPublicNotes = newNotes[phaseName]?.public || [];
+              newNotes[phaseName] = { 
+                ...newNotes[phaseName], 
+                public: [...currentPublicNotes, message] 
+              };
+              return { ...c, notes: newNotes };
+            }
+            return c;
+          }),
+        }));
+      },
+      setCurrentPhase: (caseId, phaseName) => {
+        set(state => ({
+          cases: state.cases.map(c => 
+            c.id === caseId ? { ...c, currentPhaseName: phaseName } : c
+          ),
+        }));
+      },
+      toggleActivityCompleted: (caseId, activityName) => {
+        set(state => ({
+          cases: state.cases.map(c => {
+            if (c.id === caseId) {
+              const newCompleted = { ...c.completedActivities };
+              if (newCompleted[activityName]) {
+                delete newCompleted[activityName];
+              } else {
+                newCompleted[activityName] = Date.now();
+              }
+              return { ...c, completedActivities: newCompleted };
+            }
+            return c;
+          }),
+        }));
+      },
+    }),
+    {
+      name: 'legal-app-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ cases: state.cases, myCaseIds: state.myCaseIds }),
+    }
+  )
+);

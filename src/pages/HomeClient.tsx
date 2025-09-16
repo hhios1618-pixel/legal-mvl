@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Menu, X, Phone, Mail, MapPin, Bell, Search } from "lucide-react";
+import { Shield, Menu, X, Phone, Mail, MapPin, Bell, Search, RefreshCw } from "lucide-react";
 import Hero from "../components/Hero";
 import ServiceGrid from "../components/ServiceGrid";
 import IntakeModal from "../components/IntakeModal";
 import StepsOverlay from "../components/StepsOverlay";
 import TrustStrip from "../components/TrustStrip";
+import ClientCaseView from "../components/ClientCaseView";
 import { ServiceType } from "../types";
 import { useApp } from "../store";
 
@@ -15,17 +16,23 @@ export default function HomeClient() {
   const [openSteps, setOpenSteps] = useState(false);
   const [slaStart, setSlaStart] = useState<number>(Date.now());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const create = useApp(s=>s.createIntake);
+  
+  // --- CORRECCIÓN DEFINITIVA AQUÍ ---
+  // Seleccionamos cada pieza del estado por separado para evitar el bucle infinito.
+  const createIntake = useApp(s => s.createIntake);
+  const cases = useApp(s => s.cases);
+  const myCaseIds = useApp(s => s.myCaseIds);
+  const reset = useApp(s => s.reset);
+
+  const myCases = cases.filter(c => myCaseIds.includes(c.id));
 
   const start = () => window.scrollTo({ top: document.body.clientHeight/4, behavior:"smooth" });
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* App-style Header */}
       <header className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100">
         <div className="mx-auto max-w-6xl px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo Section - App Style */}
             <motion.div 
               initial={{opacity:0,x:-20}} 
               animate={{opacity:1,x:0}}
@@ -46,52 +53,32 @@ export default function HomeClient() {
               </div>
             </motion.div>
 
-            {/* Desktop Navigation - Modern */}
             <motion.nav 
               initial={{opacity:0,y:-10}} 
               animate={{opacity:1,y:0}}
-              className="hidden lg:flex items-center gap-6"
+              className="hidden lg:flex items-center gap-2"
             >
-              <a href="#servicios" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-50">
-                Servicios
-              </a>
-              <a href="#nosotros" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-50">
-                Nosotros
-              </a>
-              <a href="#contacto" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-gray-50">
-                Contacto
-              </a>
-              <div className="w-px h-6 bg-gray-200" />
-              <a 
-                href="/abogados" 
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
+              {myCases.length > 0 && (
+                <button onClick={reset} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors">
+                  <RefreshCw className="w-4 h-4"/>
+                  Reiniciar Demo
+                </button>
+              )}
+              <a href="/abogados" className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
                 Panel Abogado
               </a>
             </motion.nav>
 
-            {/* Mobile Actions */}
             <div className="lg:hidden flex items-center gap-2">
-              <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
-                <Search className="w-5 h-5 text-gray-600" />
-              </button>
-              <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
-                <Bell className="w-5 h-5 text-gray-600" />
-              </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
               >
-                {mobileMenuOpen ? (
-                  <X className="w-5 h-5 text-gray-600" />
-                ) : (
-                  <Menu className="w-5 h-5 text-gray-600" />
-                )}
+                {mobileMenuOpen ? <X className="w-5 h-5 text-gray-600" /> : <Menu className="w-5 h-5 text-gray-600" />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Menu - App Style */}
           {mobileMenuOpen && (
             <motion.div
               initial={{opacity:0,height:0}}
@@ -100,43 +87,41 @@ export default function HomeClient() {
               className="lg:hidden mt-4 pt-4 border-t border-gray-100"
             >
               <nav className="flex flex-col gap-2">
-                <a href="#servicios" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all py-3 px-4 rounded-xl font-medium">
-                  Servicios
-                </a>
-                <a href="#nosotros" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all py-3 px-4 rounded-xl font-medium">
-                  Nosotros
-                </a>
-                <a href="#contacto" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all py-3 px-4 rounded-xl font-medium">
-                  Contacto
-                </a>
-                <a 
-                  href="/abogados" 
-                  className="mt-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold transition-all text-center shadow-lg"
-                >
+                <a href="/abogados" className="px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold transition-all text-center shadow-lg">
                   Panel Abogado
                 </a>
+                {myCases.length > 0 && (
+                  <button onClick={reset} className="flex items-center justify-center gap-2 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all rounded-xl font-medium">
+                    <RefreshCw className="w-4 h-4"/>
+                    Reiniciar Demo
+                  </button>
+                )}
               </nav>
             </motion.div>
           )}
         </div>
       </header>
-
-      {/* Main Content */}
-      <div className="relative">
-        <Hero onStart={start}/>
-        <div id="servicios">
-          <ServiceGrid onPick={(t)=>{ setPick(t); setOpenIntake(true); }}/>
-        </div>
-        <TrustStrip/>
+      
+      <div key={myCases.length > 0 ? 'dashboard' : 'landing'}>
+        {myCases.length > 0 ? (
+          <ClientCaseView cases={myCases} />
+        ) : (
+          <div className="relative">
+            <Hero onStart={start}/>
+            <div id="servicios">
+              <ServiceGrid onPick={(t)=>{ setPick(t); setOpenIntake(true); }}/>
+            </div>
+            <TrustStrip/>
+          </div>
+        )}
       </div>
 
-      {/* Modals */}
       <IntakeModal
         open={openIntake}
         type={pick}
         onClose={()=>setOpenIntake(false)}
         onSubmit={(p)=>{
-          create(p);
+          createIntake(p);
           setOpenIntake(false);
           setSlaStart(Date.now());
           setOpenSteps(true);
@@ -150,11 +135,9 @@ export default function HomeClient() {
         slaStartMs={slaStart}
       />
 
-      {/* Modern Footer */}
       <footer className="bg-white border-t border-gray-100">
         <div className="mx-auto max-w-6xl px-4 py-12">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Brand Column */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
@@ -171,8 +154,6 @@ export default function HomeClient() {
                 <span>Certificado por el Colegio de Abogados de Chile</span>
               </div>
             </div>
-
-            {/* Services Column */}
             <div>
               <h4 className="font-bold text-gray-900 mb-6 text-base">Servicios</h4>
               <ul className="space-y-3">
@@ -182,8 +163,6 @@ export default function HomeClient() {
                 <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Derecho Familiar</a></li>
               </ul>
             </div>
-
-            {/* Contact Column */}
             <div>
               <h4 className="font-bold text-gray-900 mb-6 text-base">Contacto</h4>
               <ul className="space-y-4">
@@ -211,8 +190,6 @@ export default function HomeClient() {
               </ul>
             </div>
           </div>
-
-          {/* Bottom Bar */}
           <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-gray-500">
               © {new Date().getFullYear()} Legal Chile — Todos los derechos reservados
@@ -228,4 +205,3 @@ export default function HomeClient() {
     </main>
   );
 }
-
